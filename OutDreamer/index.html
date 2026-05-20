@@ -1,0 +1,298 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>OutDreamer</title>
+<link href="./assets/style.css" rel="stylesheet">
+<script type="text/javascript" src="./assets/jquery.mlens-1.0.min.js"></script> 
+<script type="text/javascript" src="./assets/jquery.js"></script>
+<style>
+  .video-container {
+      position: relative;
+      display: inline-block;
+      text-align: center;
+  }
+  .video-text {
+            font-size: 18px;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.8); /* 可选：背景颜色 */
+            padding: 5px 10px;
+            border-radius: 5px;
+            white-space: nowrap; /* 防止换行 */
+            display: inline-block;
+        }
+  .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            width: 100%;
+            margin: 18px 0 8px;
+        }
+  .big-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 96px;
+            padding: 10px 18px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            text-align: center;
+            color: #ffffff !important;
+            background: linear-gradient(135deg, #222222, #555555);
+            text-decoration: none;
+            border-radius: 999px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+        }
+  .big-button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #000000, #3a3a3a);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
+        }
+  .citation-section {
+            margin-top: 28px;
+            margin-bottom: 36px;
+        }
+  .citation-section p {
+            text-align: center;
+            margin: 8px 0 14px;
+        }
+  .citation-box {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 18px 22px;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 14px;
+            line-height: 1.55;
+            color: #222222;
+            background: #f7f7f7;
+            border: 1px solid #e1e1e1;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+        
+</style>
+</head>
+
+<body>
+<div class="content">
+  <h1><strong>OutDreamer: Video Outpainting with a Diffusion Transformer</strong></h1>
+  <p id="authors">
+    <span>
+      <a href="https://github.com/zhongzero">Linhao Zhong</a><sup>1,*</sup>,
+    </span>
+    <span>
+      <a href="https://github.com/lifan724">Fan Li</a><sup>2,*,&Dagger;</sup>,
+    </span>
+    <span>
+      <a href="https://scholar.google.com.hk/citations?hl=zh-CN&user=BlfGxrAAAAAJ">Yi Huang</a><sup>2,3</sup>,
+    </span>
+    <span>
+      <a href="https://scholar.google.com/citations?user=sKauaAwAAAAJ&hl=en">Jianzhuang Liu</a><sup>3</sup>,
+    </span>
+    <span>
+      <a href="https://openreview.net/profile?id=~Renjing_Pei1">Renjing Pei</a><sup>2</sup>,
+    </span>
+    <span>
+      <a href="https://scholar.google.com/citations?hl=zh-CN&pli=1&user=WYDVk5oAAAAJ">Fenglong Song</a><sup>2</sup>
+    </span>
+    <br>
+    <br>
+  </p>
+    <div>
+      <p style="text-align:center; font-size: 14px; margin-bottom: -5px; margin-top: -5px;"> 
+        <sup>1</sup>
+        Zhejiang University, China
+      </p>
+      <p style="text-align:center; font-size: 14px; margin-bottom: -5px; margin-top: -5px;"> 
+        <sup>2</sup>
+        Huawei Noah's Ark Lab, China
+      </p>
+      <p style="text-align:center; font-size: 14px; margin-bottom: -5px; margin-top: -5px;"> 
+        <sup>3</sup>
+        Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, China
+      </p>
+      <p style="text-align:center; font-size: 14px; margin-bottom: -5px; margin-top: -5px;"> 
+        <sup>*</sup>
+        Equal contribution
+      </p>
+      <p style="text-align:center; font-size: 14px; margin-bottom: -5px; margin-top: -5px;"> 
+        <sup>&Dagger;</sup>
+        Corresponding author
+      </p>
+    </div>
+  <br>
+  <div class="container">
+    <a href="https://github.com/zhongzero/OutDreamer" class="big-button">Code</a>
+    <a href="https://arxiv.org/abs/2506.22298" class="big-button">arXiv</a>
+    <a href="https://zhongzero.github.io/OutDreamer/" class="big-button">Project</a>
+  </div>
+</div>
+
+<!-- <div class="content">
+  <div style="text-align: center;">
+    <video width="800" height="600" controls style="max-width: 100%;">
+      <source src="https://github.com/user-attachments/assets/1de99952-eb16-4e9f-9703-12e962138e10" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div> -->
+
+
+<div class="content">
+  <h2 style="text-align:center;">Abstract</h2>
+  <a name="fig1">
+  <br>
+  <img class="summary-img" src="./assets/overview.jpg" style="width:85%;" height="475"> <br>
+  </a>
+  <p>Video outpainting is a challenging task that generates new video content by extending beyond the boundaries of an original input video, requiring both temporal and spatial consistency. Many state-of-the-art methods utilize latent diffusion models with U-Net backbones but still struggle to achieve high quality and adaptability in generated content. Diffusion transformers (DiTs) have emerged as a promising alternative because of their superior performance. We introduce OutDreamer, a DiT-based video outpainting framework comprising two main components: an efficient video control branch and a conditional outpainting branch. The efficient video control branch effectively extracts masked video information, while the conditional outpainting branch generates missing content based on these extracted conditions. Additionally, we propose a mask-driven self-attention layer that dynamically integrates the given mask information, further enhancing the model's adaptability to outpainting tasks. Furthermore, we introduce a latent alignment loss to maintain overall consistency both within and between frames. For long video outpainting, we employ a cross-video-clip refiner to iteratively generate missing content, ensuring temporal consistency across video clips. Extensive evaluations demonstrate that our zero-shot OutDreamer outperforms state-of-the-art zero-shot methods on widely recognized benchmarks.</p>
+</div>
+
+<div class="content">
+  <h2 style="text-align:center;">Results</h2>
+  <p style="font-size: 24px;"> <b> Short Video Outpainting Results </b> </p>
+  <p> fps=8 </p>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=180>
+      <source src="./assets/mp4-libx264/example-1-input-mask.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=180>
+        <source src="./assets/mp4-libx264/example-1-output.mp4" type="video/mp4">
+      </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=180>
+      <source src="./assets/mp4-libx264/example-2-input-mask.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=180>
+        <source src="./assets/mp4-libx264/example-2-output.mp4" type="video/mp4">
+      </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=180>
+      <source src="./assets/mp4-libx264/example-3-input-mask.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=180>
+        <source src="./assets/mp4-libx264/example-3-output.mp4" type="video/mp4">
+      </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=180>
+      <source src="./assets/mp4-libx264/example-9-input-mask.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=180>
+        <source src="./assets/mp4-libx264/example-9-output.mp4" type="video/mp4">
+      </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=180>
+      <source src="./assets/mp4-libx264/example-6-input-mask.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=180>
+        <source src="./assets/mp4-libx264/example-6-output.mp4" type="video/mp4">
+      </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=180>
+      <source src="./assets/mp4-libx264/example-7-input-mask.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=180>
+        <source src="./assets/mp4-libx264/example-7-output.mp4" type="video/mp4">
+      </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=180>
+      <source src="./assets/mp4-libx264/example-8-input-mask.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=180>
+        <source src="./assets/mp4-libx264/example-8-output.mp4" type="video/mp4">
+      </video>
+  </div>
+  
+  <p style="font-size: 24px;"> <b> Long Video Outpainting Results </b> </p>
+  <p> fps=20 </p>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=360>
+      <source src="./assets/mp4-libx264/example-4-input-mask(long).mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=360>
+        <source src="./assets/mp4-libx264/example-4-output(long).mp4" type="video/mp4">
+      </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=360>
+      <source src="./assets/mp4-libx264/example-5-input-mask(long).mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=360>
+        <source src="./assets/mp4-libx264/example-5-output(long).mp4" type="video/mp4">
+      </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Input Video</div>
+    <video style="display: block;" autoplay controls muted loop height=360>
+      <source src="./assets/mp4-libx264/example-10-input-mask(long).mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="video-container">
+    <div class="video-text">Outpainting Result</div>
+      <video style="display: block;" autoplay controls muted loop height=360>
+        <source src="./assets/mp4-libx264/example-10-output(long).mp4" type="video/mp4">
+      </video>
+  </div>
+
+</div>
+
+
+<div class="content citation-section">
+  <h2 style="text-align:center;">Citation</h2>
+  <p>If you find our work useful, please consider citing:</p>
+  <pre class="citation-box"><code>@article{zhong2025outdreamer,
+  title={Outdreamer: Video outpainting with a diffusion transformer},
+  author={Zhong, Linhao and Li, Fan and Huang, Yi and Liu, Jianzhuang and Pei, Renjing and Song, Fenglong},
+  journal={arXiv preprint arXiv:2506.22298},
+  year={2025}
+}</code></pre>
+</div>
+
+</body>
+</html>
