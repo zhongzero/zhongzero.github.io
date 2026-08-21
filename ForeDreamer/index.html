@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ForeDreamer: A Self-Evolving Dual-Agent Memory Architecture for Future Event Prediction">
+    <meta property="og:title" content="ForeDreamer">
+    <meta property="og:description" content="A Self-Evolving Dual-Agent Memory Architecture for Future Event Prediction">
+    <meta property="og:type" content="website">
+    <title>ForeDreamer: Self-Evolving Memory for Future Event Prediction</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="../DiSE/fonts/avenir-next/stylesheet.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<header class="container">
+    <hr>
+    <div class="container text-center hero">
+        <div class="hero-mark x-gradient-font">ForeDreamer</div>
+        <h1 class="title-font text-body-emphasis">
+            A Self-Evolving Dual-Agent Memory Architecture for Future Event Prediction
+        </h1>
+        <p class="venue-line">EMNLP 2026 Findings</p>
+    </div>
+    <hr>
+
+    <div class="container author text-center">
+        <div class="author-row">
+            <div class="author-name">
+                <a href="https://zhongzero.github.io/"><strong>Linhao Zhong</strong></a><sup>1,*</sup>
+            </div>
+            <div class="author-name">
+                <span><strong>Zongze Du</strong></span><sup>1,*</sup>
+            </div>
+            <div class="author-name">
+                <a href="https://github.com/Celve"><strong>Linyu Wu</strong></a><sup>2</sup>
+            </div>
+            <div class="author-name">
+                <span><strong>Yu Bo</strong></span><sup>1</sup>
+            </div>
+            <div class="author-name">
+                <span><strong>Hourong Li</strong></span><sup>1</sup>
+            </div>
+        </div>
+        <div class="author-row">
+            <div class="author-name">
+                <a href="https://jingchenchen.github.io/"><strong>Chenchen Jing</strong></a><sup>1,3</sup>
+            </div>
+            <div class="author-name">
+                <a href="https://scholar.google.com/citations?user=FaOqRpcAAAAJ"><strong>Hao Chen</strong></a><sup>1</sup>
+            </div>
+            <div class="author-name">
+                <a href="https://scholar.google.com/citations?user=5n05YgoAAAAJ"><strong>Yuling Xi</strong></a><sup>1,†</sup>
+            </div>
+            <div class="author-name">
+                <a href="https://cshen.github.io/"><strong>Chunhua Shen</strong></a><sup>1,3,†</sup>
+            </div>
+        </div>
+
+        <div class="organization">
+            <sup>1</sup>Zhejiang University &nbsp;&nbsp;
+            <sup>2</sup>National University of Singapore &nbsp;&nbsp;
+            <sup>3</sup>Zhejiang University of Technology
+        </div>
+        <div class="footnote">
+            <sup>*</sup>Equal contribution &nbsp;&nbsp;
+            <sup>†</sup>Corresponding authors
+        </div>
+    </div>
+
+    <div id="links" class="text-center" aria-label="Project resources">
+        <span class="resource-pill unavailable">arXiv · Coming soon</span>
+        <span class="resource-pill unavailable">Code · Coming soon</span>
+    </div>
+</header>
+
+<main class="container">
+    <section class="card">
+        <div class="card-body x-gradient-block">
+            <h2 class="card-title text-center card-title-margin">Abstract</h2>
+            <p class="card-text">
+                Open-web future event prediction requires agents to distill reliable signals from noisy, redundant,
+                and incomplete evidence. Existing retrieval and memory mechanisms either pass retrieved information
+                directly to agents or rely on simple memory functions such as storing and reusing prior information,
+                leaving them insufficient for open-web forecasting. We propose <strong>ForeDreamer</strong>, a
+                self-evolving dual-agent framework that transforms raw web evidence into structured memory before
+                prediction. ForeDreamer separates <strong>factual memory</strong>, a question-specific evidence state
+                for the current forecast, from <strong>experiential memory</strong>, persistent agent experience
+                accumulated across forecasting episodes. A main agent searches for evidence and produces forecasts,
+                while a memory-processing subagent converts search results into factual memory with dedicated tools.
+                ForeDreamer further evolves experiential memory through two tracks, improving both forecasting
+                decisions and factual-memory construction. Experiments on Prophet Arena and FutureX demonstrate its
+                effectiveness.
+            </p>
+            <div class="text-center mt-4">
+                <figure class="figure hero-figure">
+                    <img src="./assets/overview.png" class="img-fluid rounded figure-img"
+                         alt="Overview of the ForeDreamer forecasting workflow and dual-track self-evolution">
+                    <figcaption class="figure-caption">
+                        ForeDreamer turns cutoff-aware web evidence into factual memory for each forecast and learns
+                        reusable textual and procedural experience from rollout feedback.
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card-body">
+            <h2 class="card-title card-title-margin">Motivation</h2>
+            <hr class="body-hr">
+            <p class="card-text">
+                Traditional agent-memory systems are commonly designed to store, retrieve, and reuse relatively clean
+                interaction histories. Open-web forecasting presents a different challenge: useful evidence is sparse,
+                time-sensitive, and scattered across heterogeneous sources, while search results may be outdated,
+                distracting, redundant, or mutually conflicting.
+            </p>
+            <p class="card-text">
+                ForeDreamer treats forecasting as an <strong>evidence-to-memory transformation</strong> problem. Raw
+                results are processed into a coherent, question-specific evidence interface before the forecasting
+                agent reasons over them.
+            </p>
+            <div class="text-center mt-4">
+                <figure class="figure compact-figure">
+                    <img src="./assets/memory-task-mismatch.png" class="img-fluid rounded figure-img"
+                         alt="Task mismatch between traditional agent memory and open-web future event prediction">
+                    <figcaption class="figure-caption">
+                        Existing memory mechanisms fit clean, user-centered context better than noisy and conflicting
+                        open-web evidence.
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card-body">
+            <h2 class="card-title card-title-margin">ForeDreamer Framework</h2>
+            <hr class="body-hr">
+            <div class="memory-grid">
+                <div class="memory-card factual-memory">
+                    <span class="eyebrow">Question-specific</span>
+                    <h3>Factual Memory</h3>
+                    <p>
+                        A processed evidence artifact for the current forecast, constructed from temporally valid web
+                        observations and scoped to one question.
+                    </p>
+                </div>
+                <div class="memory-card experiential-memory">
+                    <span class="eyebrow">Persistent</span>
+                    <h3>Experiential Memory</h3>
+                    <p>
+                        Reusable forecasting and evidence-processing experience that accumulates across episodes and
+                        guides future behavior.
+                    </p>
+                </div>
+            </div>
+
+            <h4>Dual-Agent Forecasting Workflow</h4>
+            <p class="card-text">
+                The <strong>main agent</strong> consults an Experience Bank, plans multi-round searches, integrates
+                processed factual memory, and produces the final probability or label. For every search result, a
+                <strong>memory-processing subagent</strong> follows a <strong>MemGuide</strong>—an explicit evidence
+                processing workflow—and invokes executable <strong>MemTools</strong> through an artifact workspace.
+                This separation makes evidence processing explicit and inspectable instead of asking the forecasting
+                model to interpret a long prompt of raw results.
+            </p>
+
+            <h4>Cutoff-Aware Forecasting</h4>
+            <p class="card-text">
+                Each question is paired with a temporal cutoff. Web search is constrained to information available at
+                prediction time, and all processed evidence is accumulated before the final forecast. The complete
+                rollout—including interactions, artifacts, ground truth, and evaluation metrics—then becomes feedback
+                for self-evolution.
+            </p>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card-body">
+            <h2 class="card-title card-title-margin">Dual-Track Self-Evolution</h2>
+            <hr class="body-hr">
+            <div class="result-grid">
+                <div class="metric-card">
+                    <span class="metric">Textual Track</span>
+                    <p>
+                        Validated add, modify, or remove operations evolve the Experience Bank for search planning,
+                        evidence integration, and forecast calibration.
+                    </p>
+                </div>
+                <div class="metric-card">
+                    <span class="metric">Procedural Track</span>
+                    <p>
+                        Rollout feedback drives validated updates to a MemGuide tree and its executable MemTools,
+                        improving how factual memory is constructed.
+                    </p>
+                </div>
+                <div class="metric-card">
+                    <span class="metric">Validation Gate</span>
+                    <p>
+                        Candidate memories and procedures are admitted only when they pass interface checks and improve
+                        validation performance on the evolution pool.
+                    </p>
+                </div>
+            </div>
+
+            <h4>Efficient and Diverse Procedural Evolution</h4>
+            <p class="card-text">
+                Vanilla rollout-based expansion can repeatedly generate near-duplicate tools and over-concentrate on
+                one successful guide family. <strong>Compositional Tool Reuse</strong> selects compatible existing
+                MemTools and generates only missing operations. <strong>Diversity-Guided Exploration</strong> adds a
+                scheduler-controlled path that proposes category-diverse candidates without requiring a new rollout,
+                while retaining the same validation gate and guide-tree provenance.
+            </p>
+            <div class="text-center mt-4">
+                <figure class="figure wide-figure">
+                    <img src="./assets/procedural-evolution.png" class="img-fluid rounded figure-img"
+                         alt="Procedural evidence-processing evolution in ForeDreamer">
+                    <figcaption class="figure-caption">
+                        Hybrid procedural evolution combines rollout-based expansion, compositional tool reuse, and
+                        diversity-guided exploration.
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card-body">
+            <h2 class="card-title card-title-margin">Experiments &amp; Results</h2>
+            <hr class="body-hr">
+            <p class="card-text">
+                ForeDreamer is evaluated on open-ended future event prediction with Qwen3.5-Flash and GPT-5.4-Nano.
+                Prophet Arena measures calibration with Brier score (lower is better), while FutureX measures prediction
+                accuracy (higher is better). Comparisons include full-text and RAG settings as well as HippoRAG 2,
+                Mem0, MemoryOS, A-MEM, LightMem, and LangMem.
+            </p>
+
+            <div class="score-grid" aria-label="ForeDreamer headline results">
+                <div class="score-card">
+                    <span class="score">0.1471</span>
+                    <span class="score-label">Prophet Arena · Qwen</span>
+                    <span class="direction">Brier ↓</span>
+                </div>
+                <div class="score-card">
+                    <span class="score">0.1839</span>
+                    <span class="score-label">Prophet Arena · GPT</span>
+                    <span class="direction">Brier ↓</span>
+                </div>
+                <div class="score-card">
+                    <span class="score">0.4108</span>
+                    <span class="score-label">FutureX · Qwen</span>
+                    <span class="direction">Accuracy ↑</span>
+                </div>
+                <div class="score-card">
+                    <span class="score">0.3883</span>
+                    <span class="score-label">FutureX · GPT</span>
+                    <span class="direction">Accuracy ↑</span>
+                </div>
+            </div>
+
+            <h4>Main Comparison</h4>
+            <div class="table-responsive result-table-wrap">
+                <table class="table result-table align-middle">
+                    <thead>
+                    <tr>
+                        <th scope="col">Benchmark / Backbone</th>
+                        <th scope="col">Full Text</th>
+                        <th scope="col">Best Existing Baseline</th>
+                        <th scope="col">ForeDreamer</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row">Prophet Arena · Qwen3.5-Flash <span class="table-direction">↓</span></th>
+                        <td>0.2059</td>
+                        <td>0.1761</td>
+                        <td class="best">0.1471</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Prophet Arena · GPT-5.4-Nano <span class="table-direction">↓</span></th>
+                        <td>0.2084</td>
+                        <td>0.1997</td>
+                        <td class="best">0.1839</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">FutureX · Qwen3.5-Flash <span class="table-direction">↑</span></th>
+                        <td>0.3298</td>
+                        <td>0.3495</td>
+                        <td class="best">0.4108</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">FutureX · GPT-5.4-Nano <span class="table-direction">↑</span></th>
+                        <td>0.2766</td>
+                        <td>0.3567</td>
+                        <td class="best">0.3883</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note">
+                “Best Existing Baseline” reports the strongest result among the compared RAG and agent-memory
+                baselines for each benchmark and backbone.
+            </p>
+
+            <h4>Dual-Track Experience Ablation</h4>
+            <div class="table-responsive result-table-wrap compact-table">
+                <table class="table result-table align-middle">
+                    <thead>
+                    <tr>
+                        <th scope="col">Method</th>
+                        <th scope="col">Prophet Arena ↓</th>
+                        <th scope="col">FutureX ↑</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row">Full Text</th>
+                        <td>0.2059</td>
+                        <td>0.3298</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">w/o evolving MemGuide &amp; MemTool</th>
+                        <td>0.1663</td>
+                        <td>0.3892</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">w/o evolving Experience Bank</th>
+                        <td>0.1769</td>
+                        <td>0.3351</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">ForeDreamer</th>
+                        <td class="best">0.1471</td>
+                        <td class="best">0.4108</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note">
+                Removing either evolution track degrades performance, showing that textual forecasting experience and
+                procedural evidence-processing experience provide complementary benefits.
+            </p>
+
+            <h4>Procedural-Evolution Optimization Ablation</h4>
+            <div class="table-responsive result-table-wrap compact-table">
+                <table class="table result-table align-middle">
+                    <thead>
+                    <tr>
+                        <th scope="col">Method</th>
+                        <th scope="col">Prophet Arena ↓</th>
+                        <th scope="col">FutureX ↑</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row">w/o both optimizations</th>
+                        <td>0.1592</td>
+                        <td>0.3850</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">w/o compositional tool reuse</th>
+                        <td>0.1541</td>
+                        <td>0.4032</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">w/o diversity-guided exploration</th>
+                        <td>0.1554</td>
+                        <td>0.3564</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">ForeDreamer</th>
+                        <td class="best">0.1471</td>
+                        <td class="best">0.4108</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note">
+                Both compositional tool reuse and diversity-guided exploration contribute to the full system. The
+                gains also remain consistent across alternative search providers, retrieval budgets, interaction
+                limits, and context lengths.
+            </p>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card-body">
+            <h2 class="card-title card-title-margin">Analysis</h2>
+            <hr class="body-hr">
+            <h4>Compositional Tool Reuse Reduces Redundancy</h4>
+            <p class="card-text">
+                Vanilla procedural evolution often rebuilds tools with overlapping source-code logic. Under the same
+                token-Jaccard clustering criterion, compositional reuse produces a higher cluster ratio across
+                similarity thresholds, indicating a less redundant MemTool set.
+            </p>
+            <div class="text-center mt-4">
+                <figure class="figure analysis-figure">
+                    <img src="./assets/tool-reuse-analysis.png" class="img-fluid rounded figure-img"
+                         alt="MemTool cluster ratio comparison with and without compositional tool reuse">
+                    <figcaption class="figure-caption">
+                        Reusing compatible operations avoids spending the evolution budget on near-duplicate tools.
+                    </figcaption>
+                </figure>
+            </div>
+
+            <h4>Diversity-Guided Exploration Broadens Strategies</h4>
+            <p class="card-text">
+                Rollout-only expansion remains concentrated in one MemGuide pipeline archetype. The exploration path
+                covers several distinct archetypes, allowing ForeDreamer to search beyond local variants of successful
+                guide families.
+            </p>
+            <div class="text-center mt-4">
+                <figure class="figure analysis-figure diversity-figure">
+                    <img src="./assets/diversity-analysis.png" class="img-fluid rounded figure-img"
+                         alt="MemGuide archetypes with and without diversity-guided exploration">
+                    <figcaption class="figure-caption">
+                        Diversity-guided exploration yields a broader set of evidence-processing pipelines.
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+
+    <section class="card citation-card">
+        <div class="card-body">
+            <h2 class="card-title card-title-margin">Citation</h2>
+            <p class="coming-soon mb-0">
+                Citation information will be added when the paper record becomes available.
+            </p>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container footer-inner">
+        <p class="footer-title mb-0">ForeDreamer</p>
+        <p class="footer-text mb-0">
+            This webpage follows the style of the
+            <a href="../DiSE/">DiSE project page</a>.
+        </p>
+    </div>
+</footer>
+</body>
+</html>
