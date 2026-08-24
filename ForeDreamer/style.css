@@ -139,6 +139,20 @@ main.container,
     font-weight: 700;
 }
 
+a.resource-pill {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(107.54deg, var(--blue) 4%, var(--purple) 48%, var(--cyan) 100%);
+    box-shadow: 0 3px 9px rgba(39, 80, 139, 0.2);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+a.resource-pill:hover {
+    color: #fff;
+    box-shadow: 0 5px 13px rgba(39, 80, 139, 0.28);
+    transform: translateY(-1px);
+}
+
 .resource-pill.unavailable {
     color: #777c84;
     background: #f2f3f5;
@@ -394,6 +408,34 @@ h4 {
     border-radius: 12px;
     color: #696f78;
     background: #f7f8fa;
+}
+
+.citation-code {
+    margin: 0 0 1rem;
+    padding: 18px 20px;
+    overflow-x: auto;
+    border: 1px solid #d9dee7;
+    border-radius: 12px;
+    color: #343942;
+    background: #f7f8fa;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.citation-code code {
+    color: inherit;
+    font-family: Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.citation-card .btn-primary {
+    border: 0;
+    background: linear-gradient(107.54deg, var(--blue) 4%, var(--purple) 58%, var(--cyan) 100%);
+}
+
+.citation-card .btn-primary:hover {
+    filter: brightness(1.06);
 }
 
 .footer {
