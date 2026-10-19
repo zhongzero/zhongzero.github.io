@@ -126,6 +126,15 @@ a:focus {
   white-space: nowrap;
 }
 
+.competition-list {
+  margin: 0 0 14px;
+  padding-left: 20px;
+}
+
+.competition-list li {
+  margin-bottom: 8px;
+}
+
 .publication {
   padding: 16px 0;
   border-bottom: 1px solid var(--border);
@@ -155,6 +164,14 @@ a:focus {
 
 .authors strong {
   color: var(--text);
+}
+
+.publication .publication-highlight {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--link);
+  background: var(--soft);
+  font-size: 0.94rem;
 }
 
 .links {
