@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0c1728">
+  <meta name="description" content="Cross-Step Recurrent Refinement carries hidden states between denoising steps in masked diffusion language models. Explore the method, diagnostics and benchmark results.">
+  <title>Recurrent-DLLM · Hidden-State Refinement</title>
+  <link rel="canonical" href="https://zhongzero.github.io/Recurrent-DLLM/">
+  <link rel="preload" href="assets/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="results.js"></script>
+</head>
+<body id="top">
+<a class="skip" href="#method">Skip to method</a>
+<header class="topbar">
+  <nav class="shell nav" aria-label="Main navigation">
+    <a class="wordmark" href="#top"><span class="mark" aria-hidden="true"><i></i></span>Recurrent-DLLM</a>
+    <div class="navlinks"><a href="#method">Method</a><a href="#evidence">Evidence</a><a href="#results">Results</a></div>
+  </nav>
+</header>
+<main>
+  <section class="hero" aria-labelledby="paper-title">
+    <div class="shell cover">
+      <div class="cover-copy">
+        <h1 id="paper-title"><span class="title-prefix">On the Importance of</span> <span class="title-focus">Hidden-State<br>Refinement</span> <span class="title-tail">in Masked Diffusion Language Models</span></h1>
+        <div class="actions"><a class="button" href="https://github.com/zhongzero/Recurrent-DLLM"><span aria-hidden="true" class="code-icon">&lt;/&gt;</span>View code on GitHub</a><span class="paper-status">arXiv <span>Coming soon</span></span></div>
+      </div>
+      <figure class="cover-art">
+        <picture><source media="(max-width: 650px)" srcset="assets/trajectories-compact.webp"><img src="assets/hidden-state-trajectories.png" width="1550" height="1160" alt="Two fields of fine violet and mint curves connected by threads, illustrating hidden-state reuse across two steps."></picture>
+        <figcaption><span><i class="swatch previous"></i>Previous step</span><span><i class="swatch current"></i>Current step</span></figcaption>
+      </figure>
+    </div>
+  </section>
+  <section class="credits" aria-label="Paper authors and affiliations">
+    <div class="shell credits-grid">
+      <p class="authors"><span><b>Linhao Zhong</b><sup>1,*</sup></span><span><b>Bozhen Fang</b><sup>1,*</sup></span><span>Xuehao Wang<sup>1</sup></span><span>Zekai Luo<sup>1</sup></span><span>Liyang Li<sup>1</sup></span><span>Hourong Li<sup>1</sup></span><span>Chenchen Jing<sup>2</sup></span><span>Hao Chen<sup>1</sup></span></p>
+      <div class="affiliations"><p><sup>1</sup> Zhejiang University, State Lab of CAD &amp; CG</p><p><sup>2</sup> Zhejiang University of Technology</p><p class="equal"><sup>*</sup> Equal contribution</p></div>
+    </div>
+  </section>
+  <section id="method" class="section method">
+    <div class="shell">
+      <div class="section-header">
+        <div><p class="section-label">Method</p><h2>Cross-step recurrent refinement</h2></div>
+        <p>Each denoising step produces hidden states as well as token predictions. CSRR saves the final block’s state so the first block can attend to it on the next step.</p>
+      </div>
+      <figure class="method-figure">
+        <a class="figure-link" href="assets/overview.png" data-title="Cross-step recurrent refinement" aria-label="Enlarge the method diagram"><img src="assets/overview.png" alt="Diagram comparing the token-level denoising trajectory with hidden-state refinement across layers and steps." width="2400" height="669" loading="lazy"></a>
+        <figcaption><span class="caption-key">The recurrent path</span><span>The previous step’s detached final state enters block 1 after self-attention and before its feed-forward network. The first denoising step runs without memory.</span></figcaption>
+      </figure>
+    </div>
+  </section>
+  <section id="evidence" class="section evidence">
+    <div class="shell">
+      <div class="section-header">
+        <div><p class="section-label">Evidence</p><h2>How hidden states evolve</h2></div>
+        <p>We traced LLaDA-8B-Instruct across 64 denoising steps on ten GSM8K examples to measure how much its representations change across layers and steps.</p>
+      </div>
+      <div class="evidence-grid">
+        <article class="diagnostic">
+          <h3>Across layers</h3><p class="metric">0.930</p>
+          <p>Mean cosine similarity between adjacent layers. Deeper layers also become more predictive of the final tokens.</p>
+          <a class="figure-link" href="assets/layer-refinement.png" data-title="Refinement across layers" aria-label="Enlarge the layer-wise diagnostic plots"><img src="assets/layer-refinement.png" loading="lazy" alt="Plots of adjacent-layer cosine similarity, similarity by layer pair and relative update magnitude."></a>
+        </article>
+        <article class="diagnostic">
+          <h3>Across steps</h3><p class="metric">0.96–0.99</p>
+          <p>Approximate range of mean final-block cosine similarity between consecutive steps. This alignment motivates reusing the previous state.</p>
+          <a class="figure-link" href="assets/cross-step.png" data-title="Alignment across steps" aria-label="Enlarge the cross-step similarity plot"><img src="assets/cross-step.png" loading="lazy" alt="Mean cosine similarity of final-block states for consecutive denoising steps."></a>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section id="results" class="section results">
+    <div class="shell">
+      <div class="section-header">
+        <div><p class="section-label">Results</p><h2>Reasoning benchmarks</h2></div>
+        <p>Compare baseline and jointly trained CSRR with the same generation length and number of forward evaluations (NFE). The paper reports the best recurrent scale for each setting.</p>
+      </div>
+      <div class="benchmark-panel">
+        <form class="controls" hidden aria-label="Benchmark settings">
+          <label>Backbone<select id="backbone"><option value="Base">LLaDA-8B-Base</option><option value="Instruct">LLaDA-8B-Instruct</option></select></label>
+          <label>Generated tokens<select id="length"><option>128</option><option>256</option></select></label>
+          <label>NFE per token<select id="budget"><option value="1">1</option><option value="0.5">½</option></select></label>
+        </form>
+        <table><caption id="setting" aria-live="polite">LLaDA-8B-Base · 128 tokens · 128 NFE</caption>
+          <thead><tr><th scope="col">Benchmark</th><th scope="col">Baseline</th><th scope="col">CSRR</th><th scope="col">Gain <small>(pp)</small></th></tr></thead>
+          <tbody id="scores"><tr><th scope="row">Countdown</th><td>6.25%</td><td>18.36%</td><td>+12.11</td></tr><tr><th scope="row">GSM8K</th><td>16.68%</td><td>37.38%</td><td>+20.70</td></tr><tr><th scope="row">SVAMP</th><td>52.00%</td><td>71.33%</td><td>+19.33</td></tr></tbody>
+        </table>
+      </div>
+      <div class="notes">
+        <article><h3>Transfer to Dream</h3><p>At 256 tokens and 128 NFE, CSRR improves accuracy on all three reasoning tasks for both Dream-7B-Base and Dream-7B-Instruct.</p><a class="text-link" href="assets/dream-results.png" data-title="Dream-7B benchmark results">View Dream results</a></article>
+        <article><h3>Inference cost</h3><p>CSRR adds 0.82% parameters. On the measured LLaDA-8B-Instruct prompt, 256 tokens at 128 NFE took 2.969 s with the baseline and 3.082 s with CSRR.</p><a class="text-link" href="assets/inference-cost.png" data-title="Parameter count and inference time">View cost comparison</a></article>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="shell footer-inner"><a class="wordmark" href="#top"><span class="mark" aria-hidden="true"><i></i></span>Recurrent-DLLM</a><a href="https://github.com/zhongzero/Recurrent-DLLM">GitHub repository</a><a href="#top">Back to top</a></div></footer>
+<dialog id="figure-viewer" aria-labelledby="figure-title"><div class="viewer-head"><h2 id="figure-title"></h2><button type="button" id="close-viewer" autofocus>Close</button></div><img id="figure-detail" alt=""><a id="full-figure" class="text-link">Open original image</a></dialog>
+</body>
+</html>
